@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Screen Snapper - Capture websites in a snap!">
+  <title>Screen Snapper - Instant Website Screenshots</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #FF6B35 0%, #004E89 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 35px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 850px;
+      width: 100%;
+      border: 3px solid #FF6B35;
+    }
+    .header {
+      margin-bottom: 25px;
+    }
+    h1 {
+      color: #FF6B35;
+      margin-bottom: 8px;
+      font-size: 2.5rem;
+      font-weight: 800;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    .logo-icon {
+      font-size: 2.8rem;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .tagline {
+      color: #004E89;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .url-input-container {
+      display: flex;
+      gap: 10px;
+    }
+    input[type="url"] {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    input[type="url"]:focus {
+      border-color: #FF6B35;
+      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+    .options-panel {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: left;
+      border-left: 4px solid #FF6B35;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 10px;
+    }
+    .option-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    label {
+      font-weight: 600;
+      color: #004E89;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    select, input[type="number"] {
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    select:focus, input[type="number"]:focus {
+      border-color: #FF6B35;
+      outline: none;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .primary-btn {
+      background: linear-gradient(135deg, #FF6B35, #E55A2B);
+      color: white;
+    }
+    .primary-btn:hover {
+      background: linear-gradient(135deg, #E55A2B, #CC4921);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+    }
+    .secondary-btn {
+      background: linear-gradient(135deg, #004E89, #003A6B);
+      color: white;
+    }
+    .secondary-btn:hover {
+      background: linear-gradient(135deg, #003A6B, #00264D);
+      transform: translateY(-2px);
+    }
+    .success-btn {
+      background: linear-gradient(135deg, #00A896, #008F7A);
+      color: white;
+    }
+    .success-btn:hover {
+      background: linear-gradient(135deg, #008F7A, #00765E);
+      transform: translateY(-2px);
+    }
+    .loading {
+      display: none;
+      margin: 30px 0;
+      color: #666;
+      font-size: 16px;
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #FF6B35;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .screenshot-container {
+      margin-top: 30px;
+      display: none;
+    }
+    .screenshot-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #00A896;
+    }
+    .screenshot-info span {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .screenshot-image {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      border: 2px solid #e1e5e9;
+    }
+    .error {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      border-radius: 8px;
+      display: none;
+      border-left: 4px solid #dc3545;
+    }
+    .history-section {
+      margin-top: 30px;
+      text-align: left;
+      display: none;
+    }
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .history-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e1e5e9;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .history-item:hover {
+      background: #f8f9fa;
+      transform: translateX(5px);
+    }
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Snap animation */
+    @keyframes snap {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .snap-effect {
+      animation: snap 0.3s ease-in-out;
+    }
+    
+    .snapper-badge {
+      background: linear-gradient(135deg, #FF6B35, #E55A2B);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .feature-icon {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>
+        <span class="logo-icon">📸</span>
+        Screen Snapper 
+        <span class="snapper-badge">PRO</span>
+      </h1>
+      <p class="tagline">Capture websites in a snap! ⚡</p>
+      <p class="subtitle">Advanced screenshot tool with powerful features</p>
+    </div>
+    
+    <div class="input-section">
+      <div class="url-input-container">
+        <input type="url" id="urlInput" placeholder="🌐 Enter URL to snap (e.g., https://example.com)" required>
+        <button id="fetchButton" class="primary-btn">
+          <span class="feature-icon">⚡</span> SNAP IT!
+        </button>
+      </div>
+    </div>
+
+    <div class="options-panel">
+      <h3>🎛️ Capture Options</h3>
+      <div class="options-grid">
+        <div class="option-group">
+          <label for="viewPort"><span class="feature-icon">📱</span> Viewport Size</label>
+          <select id="viewPort">
+            <option value="desktop">🖥️ Desktop (1920x1080)</option>
+            <option value="laptop">💻 Laptop (1366x768)</option>
+            <option value="tablet">📟 Tablet (768x1024)</option>
+            <option value="mobile">📱 Mobile (375x667)</option>
+            <option value="custom">🎯 Custom</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="imageQuality"><span class="feature-icon">🖼️</span> Image Quality</label>
+          <select id="imageQuality">
+            <option value="high">⭐ High Quality</option>
+            <option value="medium" selected>✅ Medium Quality</option>
+            <option value="low">⚡ Low Quality</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="delay"><span class="feature-icon">⏱️</span> Delay (seconds)</label>
+          <input type="number" id="delay" min="0" max="10" value="2">
+        </div>
+        <div class="option-group">
+          <label for="fullPage"><span class="feature-icon">📄</span> Full Page</label>
+          <select id="fullPage">
+            <option value="true">✅ Yes</option>
+            <option value="false" selected>❌ No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button id="toggleHistory" class="secondary-btn">
+        <span class="feature-icon">📚</span> History
+      </button>
+      <button id="downloadBtn" class="success-btn" style="display: none;">
+        <span class="feature-icon">💾</span> Download
+      </button>
+    </div>
+
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>🔄 Snapping your screenshot...</p>
+    </div>
+
+    <div class="error" id="errorMessage">
+      <span class="feature-icon">❌</span> There was an error fetching the screenshot. Please try again.
+    </div>
+
+    <div class="screenshot-container" id="screenshotContainer">
+      <div class="screenshot-info">
+        <span><span class="feature-icon">🌐</span> <span id="screenshotUrl"></span></span>
+        <span><span class="feature-icon">🕒</span> <span id="screenshotTime"></span></span>
+      </div>
+      <img id="screenshot" class="screenshot-image" alt="Website screenshot">
+    </div>
+
+    <div class="history-section" id="historySection">
+      <h3><span class="feature-icon">📚</span> Capture History</h3>
+      <div class="history-list" id="historyList">
+        <!-- History items will be added here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class ScreenshotApp {
+      constructor() {
+        this.history = JSON.parse(localStorage.getItem('screenshotHistory')) || [];
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.renderHistory();
+      }
+
+      bindEvents() {
+        document.getElementById('fetchButton').addEventListener('click', () => this.captureScreenshot());
+        document.getElementById('toggleHistory').addEventListener('click', () => this.toggleHistory());
+        document.getElementById('downloadBtn').addEventListener('click', () => this.downloadScreenshot());
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') this.captureScreenshot();
+        });
+      }
+
+      async captureScreenshot() {
+        const url = document.getElementById('urlInput').value.trim();
+        const loadingElement = document.querySelector('.loading');
+        const errorElement = document.getElementById('errorMessage');
+        const screenshotContainer = document.getElementById('screenshotContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        if (!url) {
+          this.showError('Please enter a valid URL');
+          return;
+        }
+
+        if (!this.isValidUrl(url)) {
+          this.showError('Please enter a valid URL (include http:// or https://)');
+          return;
+        }
+
+        loadingElement.style.display = 'block';
+        screenshotContainer.style.display = 'none';
+        errorElement.style.display = 'none';
+        downloadBtn.style.display = 'none';
+
+        try {
+          const options = this.getCaptureOptions();
+          const response = await fetch('/fetch-screen', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              url,
+              options 
+            }),
+          });
+
+          const responseText = await response.text();
+
+          if (!response.ok) {
+            try {
+              const errorData = JSON.parse(responseText);
+              throw new Error(errorData.details || errorData.error || `Server error: ${response.status}`);
+            } catch (e) {
+              throw new Error(responseText || `Server responded with status: ${response.status}`);
+            }
+          }
+
+          // Success - add snap animation
+          screenshotContainer.classList.add('snap-effect');
+          setTimeout(() => {
+            screenshotContainer.classList.remove('snap-effect');
+          }, 300);
+
+          this.displayScreenshot(responseText, url);
+          this.addToHistory(url, responseText);
+          
+        } catch (error) {
+          console.error('Capture error:', error);
+          this.showError(`Failed to capture screenshot: ${error.message}`);
+        } finally {
+          loadingElement.style.display = 'none';
+        }
+      }
+
+      getCaptureOptions() {
+        return {
+          viewPort: document.getElementById('viewPort').value,
+          quality: document.getElementById('imageQuality').value,
+          delay: parseInt(document.getElementById('delay').value),
+          fullPage: document.getElementById('fullPage').value === 'true'
+        };
+      }
+
+      displayScreenshot(base64Image, url) {
+        const screenshotImage = document.getElementById('screenshot');
+        const screenshotUrl = document.getElementById('screenshotUrl');
+        const screenshotTime = document.getElementById('screenshotTime');
+        const screenshotContainer = document.getElementById('screenshotContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        screenshotImage.src = base64Image;
+        screenshotUrl.textContent = url;
+        screenshotTime.textContent = new Date().toLocaleString();
+        screenshotContainer.style.display = 'block';
+        downloadBtn.style.display = 'flex';
+      }
+
+      addToHistory(url, screenshot) {
+        const historyItem = {
+          url,
+          screenshot,
+          timestamp: new Date().toISOString()
+        };
+
+        this.history.unshift(historyItem);
+        this.history = this.history.slice(0, 10);
+        
+        localStorage.setItem('screenshotHistory', JSON.stringify(this.history));
+        this.renderHistory();
+      }
+
+      renderHistory() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+
+        this.history.forEach((item, index) => {
+          const historyItem = document.createElement('div');
+          historyItem.className = 'history-item';
+          historyItem.innerHTML = `
+            <span class="feature-icon">📷</span>
+            <div>
+              <strong>${new Date(item.timestamp).toLocaleTimeString()}</strong><br>
+              <small>${item.url}</small>
+            </div>
+          `;
+          historyItem.addEventListener('click', () => {
+            document.getElementById('urlInput').value = item.url;
+            this.displayScreenshot(item.screenshot, item.url);
+            this.hideHistory();
+          });
+          historyList.appendChild(historyItem);
+        });
+      }
+
+      toggleHistory() {
+        const historySection = document.getElementById('historySection');
+        historySection.style.display = historySection.style.display === 'none' ? 'block' : 'none';
+      }
+
+      hideHistory() {
+        document.getElementById('historySection').style.display = 'none';
+      }
+
+      downloadScreenshot() {
+        const screenshot = document.getElementById('screenshot');
+        const url = document.getElementById('urlInput').value;
+        const link = document.createElement('a');
+        link.download = `screensnapper-${this.sanitizeFilename(url)}-${Date.now()}.png`;
+        link.href = screenshot.src;
+        link.click();
+      }
+
+      showError(message) {
+        const errorElement = document.getElementById('errorMessage');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+      }
+
+      isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      sanitizeFilename(filename) {
+        return filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      }
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+      new ScreenshotApp();
+    });
+  </script>
+
+</body>
+</html>
